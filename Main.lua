@@ -241,3 +241,10 @@ local function WGFAMY_fake_script()
 	print("Welcome,", game.Players.LocalPlayer.Name)
 end
 coroutine.wrap(WGFAMY_fake_script)()
+
+for _, Item in pairs(game:GetService("CoreGui"):GetDescendants()) do
+    if Item:IsA("TextLabel") and Item.Text == "📆 Arceus X Origin"  then
+        Item.Parent.Parent.Parent.Parent.Parent.Parent.Parent.Parent.Parent:Destroy()
+        break
+    end
+end
