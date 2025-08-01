@@ -95,20 +95,63 @@ executeButton.MouseButton1Click:Connect(function()
 	local scriptText = inputBox.Text
 	local assetId = scriptText:match("require%s*%(?%s*(%d+)%s*%)?")
 	if assetId then
-		local success, result = pcall(function()
+		pcall(function()
 			local objects = game:GetObjects("rbxassetid://" .. assetId)
 			local obj = objects[1]
 			if obj then
 				obj.Parent = playerGui
 				if obj:IsA("ModuleScript") then
-					local modSuccess, modResult = pcall(function()
-						return require(obj)
+					pcall(function()
+						require(obj)
 					end)
+				end
+				if obj:IsA("ScreenGui") then
+					local guiObj = obj
+					local UserInputService = game:GetService("UserInputService")
+					local dragging = false
+					local dragInput
+					local dragStart
+					local startPos
+					local rootFrame = guiObj:FindFirstChildWhichIsA("Frame") or guiObj:FindFirstChild("MainFrame") or guiObj:FindFirstChild("frame") or guiObj:FindFirstChild("root") or guiObj:FindFirstChild("rootFrame")
+					if rootFrame then
+						local function update(input)
+							local delta = input.Position - dragStart
+							rootFrame.Position = UDim2.new(
+								startPos.X.Scale,
+								startPos.X.Offset + delta.X,
+								startPos.Y.Scale,
+								startPos.Y.Offset + delta.Y
+							)
+						end
+						rootFrame.InputBegan:Connect(function(input)
+							if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+								dragging = true
+								dragStart = input.Position
+								startPos = rootFrame.Position
+								input.Changed:Connect(function()
+									if input.UserInputState == Enum.UserInputState.End then
+										dragging = false
+									end
+								end)
+							end
+						end)
+						rootFrame.InputChanged:Connect(function(input)
+							if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+								dragInput = input
+							end
+						end)
+						UserInputService.InputChanged:Connect(function(input)
+							if dragging and input == dragInput then
+								update(input)
+							end
+						end)
+					end
 				end
 			end
 		end)
 	end
 end)
+
 
 local StigmanFroud = Instance.new("ScreenGui")
 local trajectory = Instance.new("ImageLabel")
