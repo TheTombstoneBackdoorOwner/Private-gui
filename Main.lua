@@ -137,20 +137,23 @@ end)
 executeButton.MouseButton1Click:Connect(function()
 	local scriptText = inputBox.Text
 	if selectedMethod == "require" then
-		local assetId = scriptText:match("require%s*%(?%s*(%d+)%s*%)?")
-		if assetId then
-			local success, result = pcall(function()
-				local objects = game:GetObjects("rbxassetid://" .. assetId)
-				local obj = objects[1]
-				if obj then
-					obj.Parent = playerGui
-					if obj:IsA("ModuleScript") then
+	local assetId = scriptText:match("require%s*%(?%s*(%d+)%s*%)?")
+	if assetId then
+		local success, result = pcall(function()
+			local objects = game:GetObjects("rbxassetid://" .. assetId)
+			local obj = objects[1]
+			if obj then
+				obj.Parent = playerGui
+				if obj:IsA("ModuleScript") then
+					local modSuccess, modResult = pcall(function()
 						return require(obj)
-					end
+					end)
 				end
-			end)
-		end
-	elseif selectedMethod == "loadstring" then
+			end
+		end)
+	end
+end)
+		elseif selectedMethod == "loadstring" then
 		local func, err = loadstring(scriptText)
 		if func then
 			pcall(func)
