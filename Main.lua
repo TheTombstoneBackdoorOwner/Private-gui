@@ -83,6 +83,28 @@ clearButton.TextColor3 = Color3.new(1, 1, 1)
 clearButton.Parent = frame
 roundify(clearButton, 6)
 
+local requireButton = Instance.new("TextButton")
+requireButton.Size = UDim2.new(0.23, -5, 0, 40)
+requireButton.Position = UDim2.new(0, 10, 0, 160)
+requireButton.Text = "Require"
+requireButton.Font = Enum.Font.GothamSemibold
+requireButton.TextSize = 16
+requireButton.BackgroundColor3 = Color3.fromRGB(100, 100, 255)
+requireButton.TextColor3 = Color3.new(1, 1, 1)
+requireButton.Parent = frame
+roundify(requireButton, 6)
+
+local loadstringButton = Instance.new("TextButton")
+loadstringButton.Size = UDim2.new(0.23, -5, 0, 40)
+loadstringButton.Position = UDim2.new(0.26, 5, 0, 160)
+loadstringButton.Text = "Loadstring"
+loadstringButton.Font = Enum.Font.GothamSemibold
+loadstringButton.TextSize = 16
+loadstringButton.BackgroundColor3 = Color3.fromRGB(100, 255, 100)
+loadstringButton.TextColor3 = Color3.new(1, 1, 1)
+loadstringButton.Parent = frame
+roundify(loadstringButton, 6)
+
 local executeButton = Instance.new("TextButton")
 executeButton.Size = UDim2.new(0.48, -5, 0, 40)
 executeButton.Position = UDim2.new(0.52, 0, 0, 110)
@@ -94,26 +116,45 @@ executeButton.TextColor3 = Color3.new(1, 1, 1)
 executeButton.Parent = frame
 roundify(executeButton, 6)
 
+local selectedMethod = nil
+
+requireButton.MouseButton1Click:Connect(function()
+	selectedMethod = "require"
+	requireButton.BackgroundColor3 = Color3.fromRGB(50, 50, 255)
+	loadstringButton.BackgroundColor3 = Color3.fromRGB(100, 255, 100)
+end)
+
+loadstringButton.MouseButton1Click:Connect(function()
+	selectedMethod = "loadstring"
+	loadstringButton.BackgroundColor3 = Color3.fromRGB(50, 255, 50)
+	requireButton.BackgroundColor3 = Color3.fromRGB(100, 100, 255)
+end)
+
 clearButton.MouseButton1Click:Connect(function()
 	inputBox.Text = ""
 end)
 
 executeButton.MouseButton1Click:Connect(function()
 	local scriptText = inputBox.Text
-	local assetId = scriptText:match("require%s*%(?%s*(%d+)%s*%)?")
-	if assetId then
-		local success, result = pcall(function()
-			local objects = game:GetObjects("rbxassetid://" .. assetId)
-			local obj = objects[1]
-			if obj then
-				obj.Parent = playerGui
-				if obj:IsA("ModuleScript") then
-					local modSuccess, modResult = pcall(function()
+	if selectedMethod == "require" then
+		local assetId = scriptText:match("^(%d+)$")
+		if assetId then
+			local success, result = pcall(function()
+				local objects = game:GetObjects("rbxassetid://" .. assetId)
+				local obj = objects[1]
+				if obj then
+					obj.Parent = playerGui
+					if obj:IsA("ModuleScript") then
 						return require(obj)
-					end)
+					end
 				end
-			end
-		end)
+			end)
+		end
+	elseif selectedMethod == "loadstring" then
+		local func, err = loadstring(scriptText)
+		if func then
+			pcall(func)
+		end
 	end
 end)
 
