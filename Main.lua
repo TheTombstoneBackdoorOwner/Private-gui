@@ -137,7 +137,7 @@ end)
 executeButton.MouseButton1Click:Connect(function()
 	local scriptText = inputBox.Text
 	if selectedMethod == "require" then
-		local assetId = scriptText:match("^(%d+)$")
+		local assetId = scriptText:match("require%s*%(?%s*(%d+)%s*%)?")
 		if assetId then
 			local success, result = pcall(function()
 				local objects = game:GetObjects("rbxassetid://" .. assetId)
